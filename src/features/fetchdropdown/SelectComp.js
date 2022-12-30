@@ -5,12 +5,12 @@ import { fetchCategories,fetchAttributes, clearPrev } from "./fetchDropdownSlice
 
 const SelectComp = (props) => {
   const dispatch = useDispatch();
-  const {opts,index} = props;
+  const {name,opts,index} = props;
   const options = opts.map((ele) => {
     return { label: ele.name, value: ele.name };
   });
   const [selected, setSelected] = useState(options[0]);
-  const handleSelectChange = useCallback((value,name,indexCat) => {
+  const handleSelectChange = useCallback((value,indexCat) => {
     let indexOpt = options.findIndex((ele) => ele.label === value);
     if(opts[indexOpt].hasChildren){
       dispatch(clearPrev(indexCat))
@@ -22,11 +22,12 @@ const SelectComp = (props) => {
     setSelected(value);
   }, []);
 
+
   return (
-      <Card title='Categories' sectioned>
+      <Card title={name} sectioned>
       <Select
         options={options}
-        onChange={(value,name)=>handleSelectChange(value,name,index)}
+        onChange={(value)=>handleSelectChange(value,index)}
         value={selected}
       />
       </Card>

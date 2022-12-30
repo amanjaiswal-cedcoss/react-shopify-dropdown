@@ -1,19 +1,18 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit';
 
 const initialState = {
     attributes:{},
     categories:[],
-    error:{},
+    error:'',
     selectedAttributes:[],
-    status:'idle',    
+    status:'idle',  
+    targetAttribute:{},  
 };
 
 export const fetchCategories = createAsyncThunk(
     'fetchDropdown/fetchCategories',
-    async (selected) => {
-    let response;
-      try {  
-      response=await fetch("https://multi-account.sellernext.com/home/public/connector/profile/getAllCategory/",
+    async (selected,thunk) => {
+     let response= await fetch("https://multi-account.sellernext.com/home/public/connector/profile/getAllCegory/",
             {
               method: "POST",
               headers: {
@@ -39,11 +38,18 @@ export const fetchCategories = createAsyncThunk(
               }),
             }
           )
-        } catch (error) {
-          console.log(error)
-        }
-          const data=await response.json()
+          // .catch((err)=>{
+          //   console.log(err)
+          //   return thunk.rejectWithValue(JSON.stringify(err))
+          // })
+          const data=await response.json();
+          if(data.success){
           return data.data;
+          }
+          else{
+            return thunk.rejectWithValue(JSON.stringify(data))
+          }
+          
     }
   );
 
@@ -99,12 +105,15 @@ export const fetchDropdownSlice=createSlice({
         let temp=state.categories.slice(0,action.payload);
         state.categories=temp;
         state.attributes={};
-        state.selectedAttributes={};
+        state.selectedAttributes=[];
       },
       addAttribute:(state,action)=>{
-        state.selectedAttributes.push(action.payload.selectedAttribute);
-        state.attributes[action.payload.ind].disabled=true;
+        state.targetAttribute={attribute:action.payload,value:''}
       },
+      saveAttribute:(state,action)=>{
+        state.selectedAttributes.push({attribute:action.payload.name,value:action.payload.value});
+      },
+
     },
     extraReducers: (builder) => {
         builder
@@ -133,6 +142,6 @@ export const fetchDropdownSlice=createSlice({
     },
 })
 
-export const {clearPrev,addAttribute} =fetchDropdownSlice.actions; 
+export const {clearPrev,addAttribute,saveAttribute} =fetchDropdownSlice.actions; 
 
 export default fetchDropdownSlice.reducer;

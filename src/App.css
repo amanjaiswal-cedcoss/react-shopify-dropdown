@@ -12,11 +12,6 @@
     margin: 1rem 0;
 }
 
-.box--bordered  {
-    border: 1px solid #8d8181;
-    border-radius: 5px;
-}
-
 .loadspan  {
     display: flex;
     align-items: center;
