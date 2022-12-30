@@ -12,7 +12,7 @@ const initialState = {
 export const fetchCategories = createAsyncThunk(
     'fetchDropdown/fetchCategories',
     async (selected,thunk) => {
-     let response= await fetch("https://multi-account.sellernext.com/home/public/connector/profile/getAllCegory/",
+     let response= await fetch("https://multi-account.sellernext.com/home/public/connector/profile/getAllCategory/",
             {
               method: "POST",
               headers: {
