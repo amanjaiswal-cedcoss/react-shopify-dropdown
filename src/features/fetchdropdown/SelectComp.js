@@ -1,0 +1,36 @@
+import { Card, Select } from "@shopify/polaris";
+import React, { useState, useCallback, memo } from "react";
+import { useDispatch} from "react-redux";
+import { fetchCategories,fetchAttributes, clearPrev } from "./fetchDropdownSlice";
+
+const SelectComp = (props) => {
+  const dispatch = useDispatch();
+  const {opts,index} = props;
+  const options = opts.map((ele) => {
+    return { label: ele.name, value: ele.name };
+  });
+  const [selected, setSelected] = useState(options[0]);
+  const handleSelectChange = useCallback((value,name,indexCat) => {
+    let indexOpt = options.findIndex((ele) => ele.label === value);
+    if(opts[indexOpt].hasChildren){
+      dispatch(clearPrev(indexCat))
+      dispatch(fetchCategories(opts[indexOpt].parent_id));
+    }
+    else{
+      dispatch(fetchAttributes({browseNodeId:opts[indexOpt].browseNodeId,category:opts[indexOpt].category['primary-category'],sub_category:opts[indexOpt].category['sub-category']}))
+    }
+    setSelected(value);
+  }, []);
+
+  return (
+      <Card title='Categories' sectioned>
+      <Select
+        options={options}
+        onChange={(value,name)=>handleSelectChange(value,name,index)}
+        value={selected}
+      />
+      </Card>
+  );
+};
+
+export default memo(SelectComp);
