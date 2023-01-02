@@ -29,6 +29,8 @@ const FetchDropdown = () => {
     dispatch(addAttribute(value))
   }
 
+  console.log(state)
+
   return (
     <>
       {state.categories.length > 0 &&

@@ -14,6 +14,7 @@ const TextComp = (props) => {
 
   const clickHandler=()=>{
     dispatch(saveAttribute({name,value}))
+    setValue('');
   }
 
   return (

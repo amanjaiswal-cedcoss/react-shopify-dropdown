@@ -39,13 +39,17 @@ export const fetchCategories = createAsyncThunk(
               }),
             }
           )
-          const data=await response.json();
-              // error handling for failure response from API
+           // error handling for failure response from API
+          .catch(err=>{console.log(err);return thunk.rejectWithValue(err.message)})
+          let data={};
+          try{data= await response.json();}
+          catch(err){console.log(err);return thunk.rejectWithValue(err)} 
+
           if(data.success){
           return data.data;
           }
           else{
-            return thunk.rejectWithValue(JSON.stringify(data))
+            return thunk.rejectWithValue(data)
           }
           
     }
@@ -90,14 +94,18 @@ export const fetchCategories = createAsyncThunk(
               }),
             }
           )
-          const data=await response.json();
           // error handling for failure response from API
+          .catch(err=>{return thunk.rejectWithValue(err.message)})
+          let data={};
+          try{data= await response.json();}
+          catch(err){return thunk.rejectWithValue(err)} 
+
           if(data.success){
             let temp=Object.keys(data.data.Mandantory).map(ele=>{return {disabled:false,value:ele,label:ele}})
             return temp;
           }
           else{
-            return thunk.rejectWithValue(JSON.stringify(data))
+            return thunk.rejectWithValue(data)
           }
     }
   );
@@ -118,7 +126,6 @@ export const fetchDropdownSlice=createSlice({
       saveAttribute:(state,action)=>{
         state.selectedAttributes.push({attribute:action.payload.name,value:action.payload.value});
       },
-
     },
     extraReducers: (builder) => {
         builder
@@ -131,10 +138,13 @@ export const fetchDropdownSlice=createSlice({
             state.categories.push(action.payload);
           })
           .addCase(fetchCategories.rejected, (state, action) => {
+            console.log(action)
             state.status = 'idle';
-            state.error=action.payload;
+            state.error=action.payload.message;
           })
           .addCase(fetchAttributes.pending, (state) => {
+            state.selectedAttributes=[];
+            state.attributes={}
             state.status = 'loading';
             state.error=''
           })
@@ -143,8 +153,9 @@ export const fetchDropdownSlice=createSlice({
             state.attributes=action.payload;
           })
           .addCase(fetchAttributes.rejected, (state, action) => {
+            console.log(action)
             state.status = 'idle';
-            state.error=action.payload;
+            state.error=action.payload.message;
           })
     },
 })
