@@ -6,13 +6,16 @@ const initialState = {
     error:'',
     selectedAttributes:[],
     status:'idle',  
-    targetAttribute:{},  
+    targetAttribute:{},
+
 };
 
 // Async thunk to fetch the required categories from API
 export const fetchCategories = createAsyncThunk(
     'fetchDropdown/fetchCategories',
     async (selected,thunk) => {
+      let data={};
+      try{
      let response= await fetch("https://multi-account.sellernext.com/home/public/connector/profile/getAllCategory/",
             {
               method: "POST",
@@ -39,16 +42,16 @@ export const fetchCategories = createAsyncThunk(
               }),
             }
           )
-           // error handling for failure response from API
-          .catch(err=>{console.log(err);return thunk.rejectWithValue(err.message)})
-          let data={};
-          try{data= await response.json();}
-          catch(err){console.log(err);return thunk.rejectWithValue(err)} 
-
+          data= await response.json();}
+          // error handling for failure response from API
+          catch(err){return thunk.rejectWithValue(err)} 
           if(data.success){
           return data.data;
           }
           else{
+            if(data.data===null){
+              return thunk.rejectWithValue({message:'Something went wrong'})
+            }
             return thunk.rejectWithValue(data)
           }
           
@@ -59,6 +62,8 @@ export const fetchCategories = createAsyncThunk(
   export const fetchAttributes = createAsyncThunk(
     'fetchDropdown/fetchAttributes',
     async (obj,thunk) => {
+      let data=[];
+      try{
         const response=await fetch("https://multi-account.sellernext.com/home/public/connector/profile/getCategoryAttributes/",
             {
               method: "POST",
@@ -94,17 +99,18 @@ export const fetchCategories = createAsyncThunk(
               }),
             }
           )
-          // error handling for failure response from API
-          .catch(err=>{return thunk.rejectWithValue(err.message)})
-          let data={};
-          try{data= await response.json();}
-          catch(err){return thunk.rejectWithValue(err)} 
+          data= await response.json();}
 
+          // error handling for different failure responses from API
+          catch(err){return thunk.rejectWithValue(err)} 
           if(data.success){
-            let temp=Object.keys(data.data.Mandantory).map(ele=>{return {disabled:false,value:ele,label:ele}})
+          let temp=Object.keys(data.data.Mandantory).map(ele=>{return {disabled:false,value:ele,label:ele}})
             return temp;
           }
           else{
+            if(data.data===null){
+              return thunk.rejectWithValue({message:'Something went wrong'})
+            }
             return thunk.rejectWithValue(data)
           }
     }
