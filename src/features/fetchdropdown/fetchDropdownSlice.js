@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
     attributes:{},
@@ -9,6 +9,7 @@ const initialState = {
     targetAttribute:{},  
 };
 
+// Async thunk to fetch the required categories from API
 export const fetchCategories = createAsyncThunk(
     'fetchDropdown/fetchCategories',
     async (selected,thunk) => {
@@ -38,11 +39,8 @@ export const fetchCategories = createAsyncThunk(
               }),
             }
           )
-          // .catch((err)=>{
-          //   console.log(err)
-          //   return thunk.rejectWithValue(JSON.stringify(err))
-          // })
           const data=await response.json();
+              // error handling for failure response from API
           if(data.success){
           return data.data;
           }
@@ -53,9 +51,10 @@ export const fetchCategories = createAsyncThunk(
     }
   );
 
+// Async thunk to fetch the required attributes of a leaf-category from API
   export const fetchAttributes = createAsyncThunk(
     'fetchDropdown/fetchAttributes',
-    async (obj) => {
+    async (obj,thunk) => {
         const response=await fetch("https://multi-account.sellernext.com/home/public/connector/profile/getCategoryAttributes/",
             {
               method: "POST",
@@ -92,8 +91,14 @@ export const fetchCategories = createAsyncThunk(
             }
           )
           const data=await response.json();
-          let temp=Object.keys(data.data.Mandantory).map(ele=>{return {disabled:false,value:ele,label:ele}})
-          return temp;
+          // error handling for failure response from API
+          if(data.success){
+            let temp=Object.keys(data.data.Mandantory).map(ele=>{return {disabled:false,value:ele,label:ele}})
+            return temp;
+          }
+          else{
+            return thunk.rejectWithValue(JSON.stringify(data))
+          }
     }
   );
 
@@ -119,6 +124,7 @@ export const fetchDropdownSlice=createSlice({
         builder
           .addCase(fetchCategories.pending, (state) => {
             state.status = 'loading';
+            state.error='';
           })
           .addCase(fetchCategories.fulfilled, (state, action) => {
             state.status = 'idle';
@@ -130,6 +136,7 @@ export const fetchDropdownSlice=createSlice({
           })
           .addCase(fetchAttributes.pending, (state) => {
             state.status = 'loading';
+            state.error=''
           })
           .addCase(fetchAttributes.fulfilled, (state,action) => {
             state.status = 'idle';

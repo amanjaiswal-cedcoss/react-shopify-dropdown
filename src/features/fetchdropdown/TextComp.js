@@ -13,12 +13,11 @@ const TextComp = (props) => {
   }, []);
 
   const clickHandler=()=>{
-    console.log(name,value)
     dispatch(saveAttribute({name,value}))
   }
 
   return (
-      <Card title={name} sectioned subdued>
+      <Card title={name} sectioned>
         <TextField value={value} onChange={(value)=>{handleChange(value)}} />
         <br/>
         <Button primary onClick={clickHandler}>Save Attribute</Button>

@@ -6,10 +6,15 @@ import { fetchCategories,fetchAttributes, clearPrev } from "./fetchDropdownSlice
 const SelectComp = (props) => {
   const dispatch = useDispatch();
   const {name,opts,index} = props;
+
+  // mapping the options for select component from Polaris
   const options = opts.map((ele) => {
     return { label: ele.name, value: ele.name };
   });
+
   const [selected, setSelected] = useState(options[0]);
+  
+  // function to dispatch action as per the value of hasChildren in the respective category 
   const handleSelectChange = useCallback((value,indexCat) => {
     let indexOpt = options.findIndex((ele) => ele.label === value);
     if(opts[indexOpt].hasChildren){

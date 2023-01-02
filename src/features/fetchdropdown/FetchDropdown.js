@@ -1,4 +1,4 @@
-import { Banner, Button, Card, DataTable, Select } from "@shopify/polaris";
+import { Banner, Card, DataTable, Select } from "@shopify/polaris";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import TextComp from "./TextComp";
@@ -7,11 +7,18 @@ import SelectComp from "./SelectComp";
 
 const FetchDropdown = () => {
   const [selectedAttribute,setSelectedAttribute]=useState('')
+
   const state = useSelector((state) => state.fetchDropdownReducer);
+
   const dispatch = useDispatch();
+
+  // mapping the options for select component from Polaris
   const options = Object.values(state.attributes).map((ele) => {
     return ele;
   });
+
+  // mapping the row values for data table component from Polaris
+  const rows=state.selectedAttributes.map(ele=>{return Object.values(ele)})
 
   useEffect(() => {
     dispatch(fetchCategories([]));
@@ -21,7 +28,7 @@ const FetchDropdown = () => {
     setSelectedAttribute(value)
     dispatch(addAttribute(value))
   }
-  console.log(state)
+
   return (
     <>
       {state.categories.length > 0 &&
@@ -33,8 +40,8 @@ const FetchDropdown = () => {
         <>
           <Card title='Attributes' sectioned>
             <Select options={options} onChange={changeHandler} value={selectedAttribute} />
-          </Card>
-        {Object.entries(state.targetAttribute).length>0 ? <TextComp name={state.targetAttribute.attribute} val={state.targetAttribute.value}/> : ''}
+            {Object.entries(state.targetAttribute).length>0 ? <TextComp name={state.targetAttribute.attribute} val={state.targetAttribute.value}/> : ''}
+          </Card>        
       </>
       ) : (
         ""
@@ -51,11 +58,11 @@ const FetchDropdown = () => {
           />
         </span>
       )}
-      {state.selectedAttributes.length>0?<Card title='Attributes Table'>
+      {state.selectedAttributes.length>0?<Card>
         <DataTable
           columnContentTypes={['text','text']}
           headings={['Attribute','Value',]}
-          rows={state.selectedAttributes.map(ele=>{return Object.values(ele)})}
+          rows={rows}
         />
         </Card>:''}
         {state.error!==''?<Banner status="critical">Error : {state.error}</Banner>:''}
